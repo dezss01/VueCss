@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>1</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link href="css/styles.css" rel="stylesheet">
+	<script src="js/vue.js"></script>
+</head>
+<body>
+	<div class="wrapper">
+		<div class="sample">
+			<form v-if='showTable'>
+				<div class="form-group">
+					<label>Email</label>
+					<input type="text" class="form-control" v-model="email">
+					<label>Phone</label>
+					<input type="text" class="form-control" v-model="phone">
+					<label>FN</label>
+					<input type="text" class="form-control" v-model="firstName">
+					<label>LN</label>
+					<input type="text" class="form-control" v-model="lastName">
+				</div>
+				<!-- {{ fullName }} -->
+				<div class="form-group">
+					<label>Guests</label>
+					<input type="button" class="btn btn-primary" value="+" @click="addNewInputForGuest">
+				</div>
+				<div class="form-group" v-for="guest, index in guestsList" @dblclick="deleteRecordFromGuestsList(index)">
+          <p>Guest {{ index + 1 }}</p>
+          <input type="text" v-model="guestsList[index]">
+				</div>
+				<hr>
+        {{ showTable }}
+				<button class="btn btn-success" :disabled="!allowSendData" @click='toggleResultTable'>Send Data</button>
+        <!-- :disabled="disabledSendData"  -->
+			</form>
+			<div v-else>
+				<h2>All done!</h2>
+				<table class="table table-bordered">
+					<tr>
+						<td>Email</td>
+						<td>{{ email }}</td>
+					</tr>
+          <tr>
+						<td>phone</td>
+						<td>{{ phone }}</td>
+					</tr>
+          <tr>
+						<td>Full Name</td>
+						<td>{{ createFullName }}</td>
+					</tr>
+					<tr>
+						<td>Guests</td>
+            <td>
+              <div v-for="(guest, index) in guestsList">
+                {{index + 1}}. {{ guest }}
+              </div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<script>
+		Vue.createApp({
+			data: () => ({
+				email: "",
+				phone: "",
+				firstName: "",
+				lastName: "",
+        guestsList: [],
+        showTable: true
+			}),
+      methods: {
+        addNewInputForGuest(){
+          this.guestsList.push("")
+        },
+        deleteRecordFromGuestsList(index){
+          this.guestsList.splice(index, 1);
+        },
+        toggleResultTable(){
+          return this.showTable = !this.showTable;
+        }
+      },
+      computed: {
+        validatesBaseFields(){
+          if((this.email != "") && (this.phone != "") && (this.firstName != "")  && (this.lastName != "")) return true;
+          return false
+        },
+        filteredGuestsList(){
+          return this.guestsList.filter(Boolean);
+        },
+        validateGuestsList(){
+          return this.filteredGuestsList.length > 0;
+        },
+        allowSendData(){
+          return this.validatesBaseFields && this.validateGuestsList;
+        },
+        createFullName(){
+          console.log('createFullName methods')
+          return this.firstName.trim() + " " + this.lastName.trim()
+        }
+      }
+		}).mount(".sample");
+	</script>
+</body>
+</html>

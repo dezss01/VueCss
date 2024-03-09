@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ru">
+<head>
+	 <meta charset="UTF-8">
+	 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	 <title>1</title>
+	 <link rel="stylesheet" href="css/bootstrap.min.css">
+	 <link rel="stylesheet" href="css/font-awesome.min.css">
+	 <link href="css/styles.css" rel="stylesheet">
+	<style>
+		.content{
+			height: 300px;
+			overflow: auto;
+		}
+	</style>
+	 <script src="js/vue.js"></script>
+</head>
+<body>
+	<div class="wrapper">
+		<div class="sample">
+			<form v-if='!sendDataValue' @submit.prevent='sendForm'>
+				<div class="content alert alert-info" @scroll='handleScroll' ref='scrollContainer'>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+          <p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+					<p>This text no one reads. This text no one reads. This text no one reads.</p>
+				</div>
+        <div class="progress" v-if='progressBarPercentage'>
+          <div class="progress-bar" role="progressbar" :style="progressBarWidth" :aria-valuenow="progressBarPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+				<div class="form-check" v-if='showArgeeButton'>
+          <div v-for='(value, key) in agreeButtons' :key="key">
+            <label class="form-check-label">
+              <input class="form-check-input" type="checkbox" v-model='agreeButtons[key]'> 
+              {{ key }}
+            </label>
+          </div>
+				</div>
+				<div class="form-check" v-for='(value, key) in spamTypeName' :key="key" v-if='getSpam'>
+					<label class="form-check-label">
+              <input class="form-check-input" type="radio" v-model='selectedSpamType' :value='value' :id='value' :name='value'>
+              {{ value }}
+					</label>
+				</div>
+        <div class="form-check" v-if='getSpam'>
+					<label class="form-check-label">
+              <input class="form-check-input" type='email' v-model='spamData' v-if='spamInputTypeEmail'>
+              <input class="form-check-input" type='tel' v-model='spamData' pattern="[0-9]{1}-[0-9]{3}-[0-9]{3}-[0-9]{4}" v-else>
+					</label>
+				</div>
+				<hr>
+        <br>
+				<button class="btn btn-primary" :disabled='!blockSendData'>
+					Send Data
+				</button>
+			</form>
+			<div v-if='sendDataValue'>
+				<table class="table table-bordered" >
+					<tr>
+						<td >Agree All</td>
+						<td class='text-success'>Yes</td>
+					</tr>
+          <tr>
+						<td>Get Spam</td>
+						<td :class='alertClasses'>{{ yesOrNo }}</td>
+					</tr>
+          <tr v-if='selectedSpamType'>
+						<td>{{ selectedSpamType }}</td>
+						<td>{{ spamData }}</td>
+					</tr>
+				</table>
+			</div> 
+		</div>
+	</div>
+	<script>
+		const defaultClientheight = 0;
+    const defaultScrollHeight = 0;
+		Vue.createApp({
+			data: () => ({
+				spamTypeName: ['Email', 'Phone'],
+        spamData: '',
+        agreeButtons: {'Agree All': '', 'Get spam': ''},
+        selectedSpamType: '',
+        scrollPosition: 0,
+        showArgeeButton: false,
+        progressBarPercentage: 0,
+        sendDataValue: false,
+        alertType: ''
+			}),
+      methods: {
+        handleScroll(event){
+          this.scrollPosition = event.target.scrollTop;
+        },
+        sendForm(){
+          this.sendDataValue = !this.sendDataValue;
+        }
+      },
+      computed: {
+        scrolledPercentage(){
+          let scrollHeight = this.$refs.scrollContainer ? this.$refs.scrollContainer?.scrollHeight : defaultScrollHeight;
+          let clientHeight = this.$refs.scrollContainer ? this.$refs.scrollContainer?.clientHeight : defaultClientheight;
+          return this.scrollPosition / (scrollHeight - clientHeight) * 100;
+        },
+        openButton(){
+          return this.scrolledPercentage === 100;
+        },
+        progressBarWidth(){
+          return `width: ${this.progressBarPercentage}%`
+        },
+        getSpam(){
+          return this.agreeButtons['Get spam'] ? this.agreeButtons['Get spam'] : this.selectedSpamType = ''
+        },
+        blockSendData(){
+          if(this.agreeButtons['Agree All'] && this.getSpam && this.spamData.trim().length !== 0){
+            return true
+          } else if (this.agreeButtons['Agree All'] && !this.getSpam) {
+            return true
+          } else {
+            return false
+          }
+        },
+        spamInputTypeEmail(){
+          return this.selectedSpamType === 'Email'
+        },
+        alertClasses(){
+          return this.agreeButtons['Get spam'] ? 'text-success' : 'text-danger';
+        },
+        yesOrNo(){
+          return this.selectedSpamType.length === 0 ? 'No' : 'Yes'
+        }
+      },
+      watch: {
+        scrolledPercentage(returnScrolledPercentage){
+          if (returnScrolledPercentage > this.progressBarPercentage){
+            this.progressBarPercentage = Math.round(returnScrolledPercentage, 0);
+          }
+          if(returnScrolledPercentage === 100){
+            this.showArgeeButton = true;
+          }
+        }
+      },
+		}).mount('.sample');
+
+	</script>
+</body>
+</html>
